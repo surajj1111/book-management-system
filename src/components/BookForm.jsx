@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addBook } from "../services/api";
 
-function BookForm({ fetchBooks }) {
+function BookForm({ fetchBooks, editingBook, handleUpdate, setEditingBook }) {
 
   const [book, setBook] = useState({
     title: "",
@@ -9,6 +9,20 @@ function BookForm({ fetchBooks }) {
     genre: "",
     year: "",
   });
+
+  // When editing, fill the form with book data
+  useEffect(() => {
+    if (editingBook) {
+      setBook(editingBook);
+    } else {
+      setBook({
+        title: "",
+        author: "",
+        genre: "",
+        year: "",
+      });
+    }
+  }, [editingBook]);
 
   const handleChange = (e) => {
     setBook({
@@ -21,9 +35,14 @@ function BookForm({ fetchBooks }) {
     e.preventDefault();
 
     try {
-      await addBook(book);
-
-      fetchBooks();
+      if (editingBook) {
+        // Update existing book
+        await handleUpdate(book);
+      } else {
+        // Add new book
+        await addBook(book);
+        fetchBooks();
+      }
 
       setBook({
         title: "",
@@ -33,7 +52,7 @@ function BookForm({ fetchBooks }) {
       });
 
     } catch (error) {
-      console.log("Error adding book", error);
+      console.log("Error submitting book", error);
     }
   };
 
@@ -46,6 +65,7 @@ function BookForm({ fetchBooks }) {
         placeholder="Enter title"
         value={book.title}
         onChange={handleChange}
+        style={{ width: "50%", padding: "10px", marginBottom: "20px" }}
       />
 
       <input
@@ -54,6 +74,7 @@ function BookForm({ fetchBooks }) {
         placeholder="Enter author"
         value={book.author}
         onChange={handleChange}
+        style={{ width: "50%", padding: "10px", marginBottom: "20px" }} 
       />
 
       <input
@@ -62,6 +83,7 @@ function BookForm({ fetchBooks }) {
         placeholder="Enter genre"
         value={book.genre}
         onChange={handleChange}
+        style={{ width: "50%", padding: "10px", marginBottom: "20px" }}
       />
 
       <input
@@ -70,11 +92,27 @@ function BookForm({ fetchBooks }) {
         placeholder="Enter year"
         value={book.year}
         onChange={handleChange}
+        style={{ width: "50%", padding: "10px", marginBottom: "20px" }}
       />
 
-      <button type="submit">
-        Add Book
-      </button>
+      <div>
+        <button 
+          type="submit" 
+          style={{ padding: "10px 20px", backgroundColor: "#007bff", color: "white", border: "none", cursor: "pointer" }}
+        >
+          {editingBook ? "Update Book" : "Add Book"}
+        </button>
+
+        {editingBook && (
+          <button 
+            type="button"
+            onClick={() => setEditingBook(null)}
+            style={{ padding: "10px 20px", marginLeft: "10px", backgroundColor: "#6c757d", color: "white", border: "none", cursor: "pointer" }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
 
     </form>
   );

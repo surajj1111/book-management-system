@@ -7,6 +7,7 @@ function Searchbook({ searchTerm, setSearchTerm }) {
         placeholder="Search by title or author"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ width: "50%", padding: "10px", marginBottom: "20px" }}
       />
 
     </div>

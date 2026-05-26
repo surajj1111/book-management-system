@@ -4,8 +4,8 @@ function Navbar() {
       style={{
         backgroundColor: "#333",
         color: "white",
-        padding: "15px",
-        marginBottom: "20px",
+        padding: "25px",
+        marginBottom: "30px",
       }}
     >
       <h2>Book Management System</h2>

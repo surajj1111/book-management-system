@@ -8,14 +8,17 @@ import Searchbook from "./components/Searchbook";
 import {
   getBooks,
   deleteBook,
+  addBook,
+  updateBook,
 } from "./services/api";
 
 function App() {
 
   const [books, setBooks] = useState([]);
 
-
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [editingBook, setEditingBook] = useState(null);
 
 const filteredBooks = books.filter(
   (book) =>
@@ -31,7 +34,6 @@ const filteredBooks = books.filter(
   const fetchBooks = async () => {
     try {
       const response = await getBooks();
-
       setBooks(response.data);
 
     } catch (error) {
@@ -42,12 +44,32 @@ const filteredBooks = books.filter(
   // Delete Book
   const handleDelete = async (id) => {
     try {
-      await deleteBook(id);
-
+      console.log("Deleting book with id:", id);
+      const response = await deleteBook(id);
+      console.log("Delete response:", response);
       fetchBooks();
-
+      alert("Book deleted successfully!");
     } catch (error) {
-      console.log("Error deleting book", error);
+      console.error("Error deleting book:", error);
+      alert("Failed to delete book. Try again!");
+    }
+  };
+
+  // Edit Book
+  const handleEdit = (book) => {
+    setEditingBook(book);
+  };
+
+  // Update Book
+  const handleUpdate = async (updatedBook) => {
+    try {
+      await updateBook(editingBook.id, updatedBook);
+      fetchBooks();
+      setEditingBook(null);
+      alert("Book updated successfully!");
+    } catch (error) {
+      console.error("Error updating book:", error);
+      alert("Failed to update book. Try again!");
     }
   };
 
@@ -62,11 +84,19 @@ const filteredBooks = books.filter(
 
       <Searchbook searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-      <BookForm fetchBooks={fetchBooks} />
+      {searchTerm === "" && (
+        <BookForm 
+          fetchBooks={fetchBooks}
+          editingBook={editingBook}
+          handleUpdate={handleUpdate}
+          setEditingBook={setEditingBook}
+        />
+      )}
 
       <BookList
         books={filteredBooks}
         handleDelete={handleDelete}
+        handleEdit={handleEdit}
       />
 
     </div>
